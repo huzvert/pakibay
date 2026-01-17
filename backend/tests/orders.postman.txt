@@ -1,0 +1,64 @@
+# Pakibay Orders & Trust System Postman Tests
+
+# 1. Create Buy-Now Order (JWT required)
+POST {{baseUrl}}/api/orders
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+{
+  "itemId": "{{buyNowItemId}}",
+  "type": "buy-now"
+}
+
+# 2. Create Auction Order (after auction closed)
+POST {{baseUrl}}/api/orders
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+{
+  "itemId": "{{auctionItemId}}",
+  "type": "auction"
+}
+
+# 3. Prevent Duplicate Orders
+POST {{baseUrl}}/api/orders
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+{
+  "itemId": "{{buyNowItemId}}",
+  "type": "buy-now"
+}
+# (Repeat above, expect 400)
+
+# 4. Fetch User Orders
+GET {{baseUrl}}/api/orders/user
+Authorization: Bearer {{jwt}}
+
+# 5. Fetch Item Orders
+GET {{baseUrl}}/api/orders/item/{{buyNowItemId}}
+Authorization: Bearer {{jwt}}
+
+# 6. Edge: Invalid itemId
+POST {{baseUrl}}/api/orders
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+{
+  "itemId": "invalidid",
+  "type": "buy-now"
+}
+
+# 7. Edge: Unauthorized Access
+POST {{baseUrl}}/api/orders
+Content-Type: application/json
+{
+  "itemId": "{{buyNowItemId}}",
+  "type": "buy-now"
+}
+
+# 8. Edge: Auction order before auction closed
+POST {{baseUrl}}/api/orders
+Authorization: Bearer {{jwt}}
+Content-Type: application/json
+{
+  "itemId": "{{auctionItemId}}",
+  "type": "auction"
+}
+# (If auction not closed, expect 400)
